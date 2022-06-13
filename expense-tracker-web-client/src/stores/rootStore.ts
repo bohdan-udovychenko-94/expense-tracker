@@ -1,13 +1,27 @@
 import { createStore } from 'vuex'
 import VuexPersister from 'vuex-persister'
+import jwt_decode from 'jwt-decode'
 
-const vuexPersister = new VuexPersister()
+class State {
+    googleToken?: string | null
+}
+
+const vuexPersister = new VuexPersister<State>()
 
 export default createStore({
-    plugins: [vuexPersister],
+    plugins: [vuexPersister.persist],
     state() {
         return {
-            googleToken: null
+            googleToken: undefined
+        }
+    },
+    getters: {
+        userProfile({ googleToken }) {
+            if (!googleToken) {
+                return null
+            }
+
+            return jwt_decode(googleToken)
         }
     },
     mutations: {
